@@ -1,5 +1,9 @@
 package main
 
-func main() {
+import (
+	"github.com/tonyalaribe/ninja/cmd"
+)
 
+func main() {
+	cmd.Execute()
 }
