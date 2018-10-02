@@ -7,6 +7,8 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/tonyalaribe/ninja/core"
+	"github.com/tonyalaribe/ninja/uilayer"
 )
 
 var rootCmd = &cobra.Command{
@@ -14,8 +16,8 @@ var rootCmd = &cobra.Command{
 	Short: "Ninja is a dynamic api engine",
 	Long:  `Ninja lets you build powerful api's(REST, graphql, grpc, etc) for your apps and web applications using a very simple interface.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("main function")
-		// Do Stuff Here
+		manager := core.New()
+		uilayer.Register(manager)
 	},
 }
 
@@ -43,7 +45,7 @@ func initConfig(cfgFile string) func() {
 				os.Exit(1)
 			}
 
-			// Search config in home directory with name ".cobra" (without extension).
+			// Search config in home and current directory with name ".ninja" (without extension).
 			viper.AddConfigPath(home)
 			viper.AddConfigPath(".")
 			viper.SetConfigName(".ninja")

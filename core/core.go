@@ -12,6 +12,14 @@ type Config struct {
 
 type configFunc func(*Config)
 
+type Manager interface {
+	CreateCollection(name string, schema, metadata map[string]interface{}) error
+	GetSchema(collectionName string) (map[string]interface{}, error)
+	SaveItem(collectionName string, item map[string]interface{}) error
+	GetItem(collectionName, itemID string) (item map[string]interface{}, err error)
+	GetItems(collectionName string, queryMeta datalayer.QueryMeta) (items []map[string]interface{}, respInfo datalayer.ItemsResponseInfo, err error)
+}
+
 func New(configFuncs ...configFunc) *Config {
 	config := new(Config)
 	for _, f := range configFuncs {
