@@ -10,9 +10,9 @@ import (
 )
 
 type NewCollectionVM struct {
-	Name   string
-	Meta   map[string]interface{}
-	Schema map[string]interface{}
+	Name   string                 `json:"name"`
+	Meta   map[string]interface{} `json:"meta"`
+	Schema map[string]interface{} `json:"schema"`
 }
 
 func (server *Server) CreateCollection(w http.ResponseWriter, r *http.Request) (statusCode int, err error) {
