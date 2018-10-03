@@ -6,11 +6,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
 	"github.com/tonyalaribe/ninja/core"
 )
@@ -52,29 +49,17 @@ func (server *Server) Run() {
 	<-idleConnsClosed
 }
 
-func (server *Server) Routes() *chi.Mux {
-	router := chi.NewRouter()
-	router.Use(
-		render.SetContentType(render.ContentTypeJSON), // Set content-Type headers as application/json
-		middleware.Logger,                             // Log API request calls
-		middleware.DefaultCompress,                    // Compress results, mostly gzipping assets and json
-		middleware.RedirectSlashes,                    // Redirect slashes to no slash URL versions
-		middleware.Recoverer,                          // Recover from panics without crashing server
-		middleware.Timeout(60*time.Second),            // Timeout requests after 60 seconds
-	)
-	chiCors := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "POST", "DELETE"},
-		AllowCredentials: true,
-		AllowedHeaders:   []string{"Accept", "Content-Type", "X-Auth-Token", "*"},
-		Debug:            false,
-	})
-	router.Use(chiCors.Handler)
-
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello world"))
-	})
-	return router
+func ErrorWrapper(f func(w http.ResponseWriter, r *http.Request) (int, error)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		code, err := f(w, r)
+		if err != nil {
+			msg := map[string]interface{}{
+				"error": err.Error(),
+				"code":  code,
+			}
+			render.JSON(w, r, msg)
+		}
+	}
 }
 
 func ShutdownOnNotify(ctx context.Context, srv *http.Server, idleConnsClosed chan struct{}) {

@@ -12,6 +12,7 @@ type Config struct {
 
 type configFunc func(*Config)
 
+//go:generate mockgen -destination=../mocks/mock_manager.go -package=mocks github.com/tonyalaribe/ninja/core Manager
 type Manager interface {
 	CreateCollection(name string, schema, metadata map[string]interface{}) error
 	GetSchema(collectionName string) (map[string]interface{}, error)
