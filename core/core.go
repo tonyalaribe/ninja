@@ -1,6 +1,8 @@
 package core
 
 import (
+	"errors"
+
 	"github.com/globalsign/mgo/bson"
 	"github.com/tonyalaribe/ninja/datalayer"
 )
@@ -12,7 +14,6 @@ type Config struct {
 
 type configFunc func(*Config)
 
-//go:generate mockgen -destination=../mocks/mock_manager.go -package=mocks github.com/tonyalaribe/ninja/core Manager
 type Manager interface {
 	CreateCollection(name string, schema, metadata map[string]interface{}) error
 	GetSchema(collectionName string) (map[string]interface{}, error)
@@ -21,12 +22,16 @@ type Manager interface {
 	GetItems(collectionName string, queryMeta datalayer.QueryMeta) (items []map[string]interface{}, respInfo datalayer.ItemsResponseInfo, err error)
 }
 
-func New(configFuncs ...configFunc) *Config {
+func New(configFuncs ...configFunc) (*Config, error) {
 	config := new(Config)
 	for _, f := range configFuncs {
 		f(config)
 	}
-	return config
+
+	if config.datastore == nil {
+		return nil, errors.New("CORE: initialization failed. nil datastore ")
+	}
+	return config, nil
 }
 
 func (cf *Config) CreateCollection(name string, schema, metadata map[string]interface{}) error {
@@ -50,4 +55,10 @@ func (cf *Config) GetItem(collectionName, itemID string) (item map[string]interf
 
 func (cf *Config) GetItems(collectionName string, queryMeta datalayer.QueryMeta) (items []map[string]interface{}, respInfo datalayer.ItemsResponseInfo, err error) {
 	return cf.datastore.GetItems(collectionName, queryMeta)
+}
+
+func UseDataStore(ds datalayer.DataStore) configFunc {
+	return func(cf *Config) {
+		cf.datastore = ds
+	}
 }

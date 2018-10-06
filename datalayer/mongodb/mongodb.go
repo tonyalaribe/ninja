@@ -12,15 +12,25 @@ type datastore struct {
 	schemaCollection string
 }
 
-func NewDatastore(url, database, schemaCollection string) (*datastore, error) {
+const DriverName = "mongodb"
+
+func init() {
+	datalayer.Register(DriverName, &datastore{})
+}
+
+func NewDatastore(config datalayer.DBConfig) (*datastore, error) {
 	ds := datastore{}
-	session, err := mgo.Dial(url)
+	session, err := mgo.Dial(config.ConnectionString)
 	if err != nil {
 		return nil, err
 	}
-	ds.db = session.DB(database)
-	ds.schemaCollection = schemaCollection
+	ds.db = session.DB(config.DatabaseName)
+	ds.schemaCollection = config.SchemaCollectionName
 	return &ds, nil
+}
+
+func (ds *datastore) Connect(config datalayer.DBConfig) (datalayer.DataStore, error) {
+	return NewDatastore(config)
 }
 
 func (ds *datastore) CreateCollection(name string, schema, metadata map[string]interface{}) error {
