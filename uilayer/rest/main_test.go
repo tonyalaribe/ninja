@@ -2,7 +2,8 @@ package rest
 
 import (
 	"bytes"
-	"fmt"
+	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http/httptest"
 	"reflect"
@@ -36,7 +37,6 @@ func AssertNotEqual(t *testing.T, a interface{}, b interface{}) {
 
 func TestPing(t *testing.T) {
 	server := httptest.NewServer(ErrorWrapper(PingPong))
-	// Close the server when test finishes
 	defer server.Close()
 
 	resp, err := server.Client().Get(server.URL)
@@ -44,37 +44,24 @@ func TestPing(t *testing.T) {
 
 	bb, err := ioutil.ReadAll(resp.Body)
 	AssertEqual(t, err, nil)
-	fmt.Println(string(bb))
+	AssertEqual(t, string(bb), "pong")
 }
 
-func GetCoreManager(t *testing.T) (coreManager core.Manager, mockCtrler *gomock.Controller, err error) {
+func GetCoreManager(t *testing.T) (coreManager core.Manager, mockDataStore *mock.MockDataStore, mockCtrler *gomock.Controller, err error) {
 	if dataStore != nil {
 		coreManager, err := core.New(core.UseDataStore(dataStore))
-		return coreManager, nil, err
+		return coreManager, nil, nil, err
 	}
 
 	mockCtrler = gomock.NewController(t)
 	// NOTE: defer mockCtrler.Finish() on caller
 
-	mockManager := mock.NewMockDataStore(mockCtrler)
-	coreManager, err = core.New(core.UseDataStore(mockManager))
-	return coreManager, mockCtrler, err
+	mockDataStore = mock.NewMockDataStore(mockCtrler)
+	coreManager, err = core.New(core.UseDataStore(mockDataStore))
+	return coreManager, mockDataStore, mockCtrler, err
 }
 
 func TestCreateCollection(t *testing.T) {
-	coreManager, mockCtrler, err := GetCoreManager(t)
-	if mockCtrler != nil {
-		defer mockCtrler.Finish()
-	}
-
-	s := &Server{
-		core: coreManager,
-	}
-	server := httptest.NewServer(ErrorWrapper(s.CreateCollection))
-
-	// Close the server when test finishes
-	defer server.Close()
-
 	req := `
 	{
 		"name": "testcollection", 
@@ -118,11 +105,37 @@ func TestCreateCollection(t *testing.T) {
 		"meta":{}
 	}
 	`
+	var collectionData NewCollectionVM
+	err := json.Unmarshal([]byte(req), &collectionData)
+	AssertEqual(t, err, nil)
+	coreManager, mockDataStore, mockCtrler, err := GetCoreManager(t)
+	if mockCtrler != nil {
+		mockDataStore.EXPECT().CreateCollection(collectionData.Name, collectionData.Schema, collectionData.Meta)
+		defer mockCtrler.Finish()
+	}
+
+	s := &Server{
+		core: coreManager,
+	}
+	server := httptest.NewServer(ErrorWrapper(s.CreateCollection))
+
+	// Close the server when test finishes
+	defer server.Close()
 	body := bytes.NewReader([]byte(req))
 	resp, err := server.Client().Post(server.URL, "application/json", body)
 	AssertEqual(t, err, nil)
 
-	bb, err := ioutil.ReadAll(resp.Body)
+	RespIsNotError(t, resp.Body)
+}
+
+func RespIsNotError(t *testing.T, resp io.Reader) {
+	respData := map[string]interface{}{}
+	err := json.NewDecoder(resp).Decode(&respData)
 	AssertEqual(t, err, nil)
-	fmt.Println(string(bb))
+
+	_, ok := respData["error"]
+	if ok {
+		t.Errorf("got an error response: %v", respData)
+	}
+
 }

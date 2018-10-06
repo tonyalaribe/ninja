@@ -31,7 +31,6 @@ func TestMain(m *testing.M) {
 	}
 	DropDB(dataStore)
 	defer DropDB(dataStore)
-	// mongoDBInstance.DB.DropDatabase()
 	os.Exit(m.Run())
 }
 
