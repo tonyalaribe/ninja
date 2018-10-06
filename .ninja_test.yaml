@@ -1,0 +1,9 @@
+is_production: false 
+short_name: AppName
+long_name: App Name
+
+db_config:
+  driver_type: mongodb
+  connection_string: mongodb://localhost:27017
+  database_name: ninja_test
+  schema_collection_name: schema_collection

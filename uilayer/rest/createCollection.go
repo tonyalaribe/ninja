@@ -27,6 +27,7 @@ func (server *Server) CreateCollection(w http.ResponseWriter, r *http.Request) (
 		return http.StatusInternalServerError, errors.Wrap(err, "REST: CreateCollection failed")
 	}
 
+	render.JSON(w, r, ResponseMessage(http.StatusOK, "Collection created successfully"))
 	return http.StatusOK, nil
 }
 

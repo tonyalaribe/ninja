@@ -23,13 +23,13 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		datastore, err := datalayer.Connect(config.DBConfig.DriverType, config.DBConfig)
 		if err != nil {
-			log.Fatalf("unable to initialize datalayer with error: `%v`", err)
+			log.Fatalf("Unable to initialize datalayer with error: `%v`", err)
 			return
 		}
 
 		manager, err := core.New(core.UseDataStore(datastore))
 		if err != nil {
-			log.Fatalf("unable to initialize core with error: `%v`", err)
+			log.Fatalf("Unable to initialize core with error: `%v`", err)
 			return
 		}
 		uilayer.Register(manager)

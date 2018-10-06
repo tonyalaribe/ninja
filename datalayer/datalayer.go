@@ -31,7 +31,6 @@ func Connect(name string, dbConfig DBConfig) (DataStore, error) {
 	if driver == nil {
 		return nil, errors.New("datalayer: No such driver available")
 	}
-
 	return driver.Connect(dbConfig)
 }
 
@@ -42,7 +41,7 @@ type DBConfig struct {
 	SchemaCollectionName string `mapstructure:"schema_collection_name"` // where schemas will be stored.
 }
 
-//go:generate mockgen -destination=./mock/mock_datastore.go -package=mocks github.com/tonyalaribe/ninja/datalayer DataStore
+//go:generate mockgen -destination=./mock/mock_datastore.go -package=mock github.com/tonyalaribe/ninja/datalayer DataStore
 type DataStore interface {
 	Connect(dbConfig DBConfig) (datastore DataStore, err error)
 	CreateCollection(name string, schema, metadata map[string]interface{}) error

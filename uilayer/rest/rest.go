@@ -80,3 +80,10 @@ func ChiWalkFunc(method string, route string, handler http.Handler, middlewares 
 	log.Printf("👉 %s %s\n", method, route)
 	return nil
 }
+
+func ResponseMessage(statusCode int, message string) map[string]interface{} {
+	resp := make(map[string]interface{})
+	resp["code"] = statusCode
+	resp["message"] = message
+	return resp
+}
