@@ -30,7 +30,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Panicf("unable to connect to datastore, %v", err)
 	}
-	// DropDB(dataStore)
+	DropDB(dataStore)
 	// defer DropDB(dataStore)
 	os.Exit(m.Run())
 }

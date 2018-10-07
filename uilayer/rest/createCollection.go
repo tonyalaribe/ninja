@@ -51,29 +51,20 @@ func (server *Server) GetSchema(w http.ResponseWriter, r *http.Request) (statusC
 	return http.StatusOK, nil
 }
 
-/*
 func (server *Server) SaveItem(w http.ResponseWriter, r *http.Request) (statusCode int, err error) {
-	collectionName := chi.Param("collectionName")
+	collectionName := chi.URLParam(r, "collectionName")
 
-	resource := GetSchemaVM{}
+	resource := map[string]interface{}{}
 	err = json.NewDecoder(r.Body).Decode(&resource)
 	if err != nil {
-		return http.StatusInternalServerError, errors.Wrap(err, "REST: GetSchema failed")
+		return http.StatusInternalServerError, errors.Wrap(err, "REST: SaveItem failed")
 	}
 
-	err = server.core.GetSchema(resource.Name, resource.Schema, resource.Meta)
+	err = server.core.SaveItem(collectionName, resource)
 	if err != nil {
-		return http.StatusInternalServerError, errors.Wrap(err, "REST: GetSchema failed")
+		return http.StatusInternalServerError, errors.Wrap(err, "REST: SaveItem failed")
 	}
 
+	render.JSON(w, r, ResponseMessage(http.StatusOK, "Saved Item Successfully"))
 	return http.StatusOK, nil
 }
-*/
-
-/*
-	CreateCollection(name string, schema, metadata map[string]interface{}) error
-	GetSchema(collectionName string) (map[string]interface{}, error)
-	SaveItem(collectionName, itemID string, item map[string]interface{}) error
-	GetItem(collectionName, itemID string) (item map[string]interface{}, err error)
-	GetItems(collectionName string, queryMeta QueryMeta) (items []map[string]interface{}, respInfo ItemsResponseInfo, err error)
-*/

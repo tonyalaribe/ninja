@@ -2,9 +2,11 @@ package core
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/globalsign/mgo/bson"
 	"github.com/tonyalaribe/ninja/datalayer"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 type Config struct {
@@ -35,8 +37,27 @@ func New(configFuncs ...configFunc) (*Config, error) {
 	return config, nil
 }
 
+type ValidationErrors []gojsonschema.ResultError
+
+func (v ValidationErrors) Error() string {
+	message := strings.Builder{}
+	for _, vv := range v {
+		message.WriteString(vv.String() + "\n")
+	}
+	return message.String()
+}
+
+func (v ValidationErrors) ValidationErrors() []gojsonschema.ResultError {
+	return ([]gojsonschema.ResultError)(v)
+}
+
 func (cf *Config) CreateCollection(name string, schema, metadata map[string]interface{}) error {
-	return cf.datastore.CreateCollection(name, schema, metadata)
+	loader := gojsonschema.NewGoLoader(schema)
+	validatedSchema, err := loader.LoadJSON()
+	if err != nil {
+		return err
+	}
+	return cf.datastore.CreateCollection(name, validatedSchema.(map[string]interface{}), metadata)
 }
 
 func (cf *Config) GetCollections() (collections []datalayer.CollectionVM, err error) {
@@ -48,7 +69,25 @@ func (cf *Config) GetSchema(collectionName string) (schema map[string]interface{
 }
 
 func (cf *Config) SaveItem(collectionName string, item map[string]interface{}) error {
+	schema, err := cf.datastore.GetSchema(collectionName)
+	schemaLoader := gojsonschema.NewGoLoader(schema)
+	dataLoader := gojsonschema.NewGoLoader(item)
+
+	result, err := gojsonschema.Validate(schemaLoader, dataLoader)
+	if err != nil {
+		return err
+	}
+
+	if !result.Valid() {
+		// invalid document. Should case error back into gojsonschema error list in uilayer
+		return ValidationErrors(result.Errors())
+	}
+
 	itemID := bson.NewObjectId().Hex()
+	if n_id, ok := item["_id"].(string); ok && n_id != "" {
+		itemID = n_id
+	}
+
 	// TODO(tonyalaribe): investigate how to handle slugs, and indexing.
 
 	return cf.datastore.SaveItem(collectionName, itemID, item)

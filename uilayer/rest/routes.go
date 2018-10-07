@@ -31,6 +31,7 @@ func (server *Server) Routes() *chi.Mux {
 	router.Post("/api/collections", ErrorWrapper(server.CreateCollection))
 	router.Get("/api/collections", ErrorWrapper(server.GetCollections))
 	router.Get("/api/collections/{collectionName}", ErrorWrapper(server.GetSchema))
+	router.Post("/api/collections/{collectionName}", ErrorWrapper(server.SaveItem))
 	router.Get("/ping", ErrorWrapper(PingPong))
 	return router
 }
