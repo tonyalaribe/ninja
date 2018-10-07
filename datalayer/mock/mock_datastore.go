@@ -58,6 +58,19 @@ func (mr *MockDataStoreMockRecorder) CreateCollection(arg0, arg1, arg2 interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollection", reflect.TypeOf((*MockDataStore)(nil).CreateCollection), arg0, arg1, arg2)
 }
 
+// GetCollections mocks base method
+func (m *MockDataStore) GetCollections() ([]datalayer.CollectionVM, error) {
+	ret := m.ctrl.Call(m, "GetCollections")
+	ret0, _ := ret[0].([]datalayer.CollectionVM)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCollections indicates an expected call of GetCollections
+func (mr *MockDataStoreMockRecorder) GetCollections() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollections", reflect.TypeOf((*MockDataStore)(nil).GetCollections))
+}
+
 // GetItem mocks base method
 func (m *MockDataStore) GetItem(arg0, arg1 string) (map[string]interface{}, error) {
 	ret := m.ctrl.Call(m, "GetItem", arg0, arg1)

@@ -29,6 +29,7 @@ func (server *Server) Routes() *chi.Mux {
 	})
 	router.Use(chiCors.Handler)
 	router.Post("/api/collections", ErrorWrapper(server.CreateCollection))
+	router.Get("/api/collections", ErrorWrapper(server.GetCollections))
 	router.Get("/api/collections/{collectionName}", ErrorWrapper(server.GetSchema))
 	router.Get("/ping", ErrorWrapper(PingPong))
 	return router

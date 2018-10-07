@@ -16,6 +16,7 @@ type configFunc func(*Config)
 
 type Manager interface {
 	CreateCollection(name string, schema, metadata map[string]interface{}) error
+	GetCollections() (collections []datalayer.CollectionVM, err error)
 	GetSchema(collectionName string) (map[string]interface{}, error)
 	SaveItem(collectionName string, item map[string]interface{}) error
 	GetItem(collectionName, itemID string) (item map[string]interface{}, err error)
@@ -36,6 +37,10 @@ func New(configFuncs ...configFunc) (*Config, error) {
 
 func (cf *Config) CreateCollection(name string, schema, metadata map[string]interface{}) error {
 	return cf.datastore.CreateCollection(name, schema, metadata)
+}
+
+func (cf *Config) GetCollections() (collections []datalayer.CollectionVM, err error) {
+	return cf.datastore.GetCollections()
 }
 
 func (cf *Config) GetSchema(collectionName string) (schema map[string]interface{}, err error) {

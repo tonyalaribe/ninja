@@ -41,10 +41,17 @@ type DBConfig struct {
 	SchemaCollectionName string `mapstructure:"schema_collection_name"` // where schemas will be stored.
 }
 
+type CollectionVM struct {
+	Name   string
+	Schema map[string]interface{}
+	Meta   map[string]interface{}
+}
+
 //go:generate mockgen -destination=./mock/mock_datastore.go -package=mock github.com/tonyalaribe/ninja/datalayer DataStore
 type DataStore interface {
 	Connect(dbConfig DBConfig) (datastore DataStore, err error)
 	CreateCollection(name string, schema, metadata map[string]interface{}) error
+	GetCollections() (collections []CollectionVM, err error)
 	GetSchema(collectionName string) (map[string]interface{}, error)
 	SaveItem(collectionName, itemID string, item map[string]interface{}) error
 	GetItem(collectionName, itemID string) (item map[string]interface{}, err error)

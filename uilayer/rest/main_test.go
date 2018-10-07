@@ -44,7 +44,10 @@ func GetCoreManager(t *testing.T) (coreManager core.Manager, mockDataStore *mock
 func RespIsNotError(t *testing.T, resp io.Reader) {
 	respData := map[string]interface{}{}
 	err := json.NewDecoder(resp).Decode(&respData)
-	AssertEqual(t, err, nil)
+	if err != nil {
+		// most likely an array type, so definitely not the generic error return message
+		return
+	}
 
 	_, ok := respData["error"]
 	if ok {

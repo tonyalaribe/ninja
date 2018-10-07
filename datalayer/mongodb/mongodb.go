@@ -53,6 +53,11 @@ func (ds *Datastore) CreateCollection(name string, schema, metadata map[string]i
 	return nil
 }
 
+func (ds *Datastore) GetCollections() (collections []datalayer.CollectionVM, err error) {
+	err = ds.DB.C(ds.SchemaCollection).Find(nil).All(&collections)
+	return collections, err
+}
+
 func (ds *Datastore) GetSchema(collectionName string) (map[string]interface{}, error) {
 	result := collectionData{}
 	err := ds.DB.C(ds.SchemaCollection).FindId(collectionName).One(&result)
