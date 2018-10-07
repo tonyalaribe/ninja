@@ -24,13 +24,14 @@ type Config struct {
 func TestMain(m *testing.M) {
 	var err error
 	config := GetConfig()
+
 	// dataStore is a global in main_test.go
 	dataStore, err = datalayer.Connect(config.DBConfig.DriverType, config.DBConfig)
 	if err != nil {
 		log.Panicf("unable to connect to datastore, %v", err)
 	}
-	DropDB(dataStore)
-	defer DropDB(dataStore)
+	// DropDB(dataStore)
+	// defer DropDB(dataStore)
 	os.Exit(m.Run())
 }
 

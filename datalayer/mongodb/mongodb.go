@@ -33,9 +33,18 @@ func (ds *Datastore) Connect(config datalayer.DBConfig) (datalayer.DataStore, er
 	return NewDatastore(config)
 }
 
+type collectionData struct {
+	ID       string                 `bson:"_id"`
+	Schema   map[string]interface{} `bson:"schema"`
+	MetaData map[string]interface{} `bson:"metadata"`
+}
+
 func (ds *Datastore) CreateCollection(name string, schema, metadata map[string]interface{}) error {
-	schema["_id"] = name
-	err := ds.DB.C(ds.SchemaCollection).Insert(schema)
+	data := collectionData{}
+	data.ID = name
+	data.Schema = schema
+	data.MetaData = metadata
+	err := ds.DB.C(ds.SchemaCollection).Insert(data)
 	if err != nil {
 		return errors.Wrap(err, "mongoDB: unable to create collection")
 	}
@@ -45,9 +54,9 @@ func (ds *Datastore) CreateCollection(name string, schema, metadata map[string]i
 }
 
 func (ds *Datastore) GetSchema(collectionName string) (map[string]interface{}, error) {
-	result := map[string]interface{}{}
+	result := collectionData{}
 	err := ds.DB.C(ds.SchemaCollection).FindId(collectionName).One(&result)
-	return result, errors.Wrap(err, "mongoDB: unable to get schema")
+	return result.Schema, errors.Wrap(err, "mongoDB: unable to get schema")
 }
 
 func (ds *Datastore) SaveItem(collectionName, itemID string, item map[string]interface{}) error {

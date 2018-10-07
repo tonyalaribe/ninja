@@ -38,7 +38,7 @@ func (cf *Config) CreateCollection(name string, schema, metadata map[string]inte
 	return cf.datastore.CreateCollection(name, schema, metadata)
 }
 
-func (cf *Config) GetSchema(collectionName string) (map[string]interface{}, error) {
+func (cf *Config) GetSchema(collectionName string) (schema map[string]interface{}, err error) {
 	return cf.datastore.GetSchema(collectionName)
 }
 
