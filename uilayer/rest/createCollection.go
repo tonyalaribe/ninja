@@ -22,7 +22,7 @@ func (server *Server) CreateCollection(w http.ResponseWriter, r *http.Request) (
 		return nil, http.StatusInternalServerError, errors.Wrap(err, "REST: CreateCollection failed")
 	}
 
-	err = server.core.CreateCollection(resource.Name, resource.Schema, resource.Meta)
+	err = server.core.CreateCollection(r.Context(), resource.Name, resource.Schema, resource.Meta)
 	if err != nil {
 		return nil, http.StatusInternalServerError, errors.Wrap(err, "REST: CreateCollection failed")
 	}
@@ -31,7 +31,7 @@ func (server *Server) CreateCollection(w http.ResponseWriter, r *http.Request) (
 }
 
 func (server *Server) GetCollections(w http.ResponseWriter, r *http.Request) (responseData interface{}, statusCode int, err error) {
-	collections, err := server.core.GetCollections()
+	collections, err := server.core.GetCollections(r.Context())
 	if err != nil {
 		return nil, http.StatusInternalServerError, errors.Wrap(err, "REST: GetCollections failed")
 	}
@@ -41,7 +41,7 @@ func (server *Server) GetCollections(w http.ResponseWriter, r *http.Request) (re
 func (server *Server) GetSchema(w http.ResponseWriter, r *http.Request) (responseData interface{}, statusCode int, err error) {
 	collectionName := chi.URLParam(r, "collectionName")
 
-	schema, err := server.core.GetSchema(collectionName)
+	schema, err := server.core.GetSchema(r.Context(), collectionName)
 	if err != nil {
 		return nil, http.StatusNotFound, errors.Wrap(err, "REST: GetSchema failed")
 	}
@@ -57,7 +57,7 @@ func (server *Server) SaveItem(w http.ResponseWriter, r *http.Request) (response
 		return nil, http.StatusInternalServerError, errors.Wrap(err, "REST: SaveItem failed")
 	}
 
-	err = server.core.SaveItem(collectionName, resource)
+	err = server.core.SaveItem(r.Context(), collectionName, resource)
 	if err != nil {
 		return nil, http.StatusInternalServerError, errors.Wrap(err, "REST: SaveItem failed")
 	}
@@ -68,7 +68,7 @@ func (server *Server) GetItem(w http.ResponseWriter, r *http.Request) (responseD
 	collectionName := chi.URLParam(r, "collectionName")
 	itemID := chi.URLParam(r, "itemID")
 
-	item, err := server.core.GetItem(collectionName, itemID)
+	item, err := server.core.GetItem(r.Context(), collectionName, itemID)
 	if err != nil {
 		return item, http.StatusInternalServerError, errors.Wrap(err, "REST: GetItem failed")
 	}
@@ -85,7 +85,7 @@ func (server *Server) GetItems(w http.ResponseWriter, r *http.Request) (response
 	collectionName := chi.URLParam(r, "collectionName")
 
 	query := datalayer.QueryMeta{}
-	items, respInfo, err := server.core.GetItems(collectionName, query)
+	items, respInfo, err := server.core.GetItems(r.Context(), collectionName, query)
 	if err != nil {
 		return nil, http.StatusInternalServerError, errors.Wrap(err, "REST: GetItem failed")
 	}

@@ -5,6 +5,7 @@
 package mock
 
 import (
+	context "context"
 	gomock "github.com/golang/mock/gomock"
 	datalayer "github.com/tonyalaribe/ninja/datalayer"
 	reflect "reflect"
@@ -47,46 +48,46 @@ func (mr *MockDataStoreMockRecorder) Connect(arg0 interface{}) *gomock.Call {
 }
 
 // CreateCollection mocks base method
-func (m *MockDataStore) CreateCollection(arg0 string, arg1, arg2 map[string]interface{}) error {
-	ret := m.ctrl.Call(m, "CreateCollection", arg0, arg1, arg2)
+func (m *MockDataStore) CreateCollection(arg0 context.Context, arg1 string, arg2, arg3 map[string]interface{}) error {
+	ret := m.ctrl.Call(m, "CreateCollection", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateCollection indicates an expected call of CreateCollection
-func (mr *MockDataStoreMockRecorder) CreateCollection(arg0, arg1, arg2 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollection", reflect.TypeOf((*MockDataStore)(nil).CreateCollection), arg0, arg1, arg2)
+func (mr *MockDataStoreMockRecorder) CreateCollection(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollection", reflect.TypeOf((*MockDataStore)(nil).CreateCollection), arg0, arg1, arg2, arg3)
 }
 
 // GetCollections mocks base method
-func (m *MockDataStore) GetCollections() ([]datalayer.CollectionVM, error) {
-	ret := m.ctrl.Call(m, "GetCollections")
+func (m *MockDataStore) GetCollections(arg0 context.Context) ([]datalayer.CollectionVM, error) {
+	ret := m.ctrl.Call(m, "GetCollections", arg0)
 	ret0, _ := ret[0].([]datalayer.CollectionVM)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetCollections indicates an expected call of GetCollections
-func (mr *MockDataStoreMockRecorder) GetCollections() *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollections", reflect.TypeOf((*MockDataStore)(nil).GetCollections))
+func (mr *MockDataStoreMockRecorder) GetCollections(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollections", reflect.TypeOf((*MockDataStore)(nil).GetCollections), arg0)
 }
 
 // GetItem mocks base method
-func (m *MockDataStore) GetItem(arg0, arg1 string) (map[string]interface{}, error) {
-	ret := m.ctrl.Call(m, "GetItem", arg0, arg1)
+func (m *MockDataStore) GetItem(arg0 context.Context, arg1, arg2 string) (map[string]interface{}, error) {
+	ret := m.ctrl.Call(m, "GetItem", arg0, arg1, arg2)
 	ret0, _ := ret[0].(map[string]interface{})
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetItem indicates an expected call of GetItem
-func (mr *MockDataStoreMockRecorder) GetItem(arg0, arg1 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetItem", reflect.TypeOf((*MockDataStore)(nil).GetItem), arg0, arg1)
+func (mr *MockDataStoreMockRecorder) GetItem(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetItem", reflect.TypeOf((*MockDataStore)(nil).GetItem), arg0, arg1, arg2)
 }
 
 // GetItems mocks base method
-func (m *MockDataStore) GetItems(arg0 string, arg1 datalayer.QueryMeta) ([]map[string]interface{}, datalayer.ItemsResponseInfo, error) {
-	ret := m.ctrl.Call(m, "GetItems", arg0, arg1)
+func (m *MockDataStore) GetItems(arg0 context.Context, arg1 string, arg2 datalayer.QueryMeta) ([]map[string]interface{}, datalayer.ItemsResponseInfo, error) {
+	ret := m.ctrl.Call(m, "GetItems", arg0, arg1, arg2)
 	ret0, _ := ret[0].([]map[string]interface{})
 	ret1, _ := ret[1].(datalayer.ItemsResponseInfo)
 	ret2, _ := ret[2].(error)
@@ -94,31 +95,31 @@ func (m *MockDataStore) GetItems(arg0 string, arg1 datalayer.QueryMeta) ([]map[s
 }
 
 // GetItems indicates an expected call of GetItems
-func (mr *MockDataStoreMockRecorder) GetItems(arg0, arg1 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetItems", reflect.TypeOf((*MockDataStore)(nil).GetItems), arg0, arg1)
+func (mr *MockDataStoreMockRecorder) GetItems(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetItems", reflect.TypeOf((*MockDataStore)(nil).GetItems), arg0, arg1, arg2)
 }
 
 // GetSchema mocks base method
-func (m *MockDataStore) GetSchema(arg0 string) (map[string]interface{}, error) {
-	ret := m.ctrl.Call(m, "GetSchema", arg0)
+func (m *MockDataStore) GetSchema(arg0 context.Context, arg1 string) (map[string]interface{}, error) {
+	ret := m.ctrl.Call(m, "GetSchema", arg0, arg1)
 	ret0, _ := ret[0].(map[string]interface{})
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetSchema indicates an expected call of GetSchema
-func (mr *MockDataStoreMockRecorder) GetSchema(arg0 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSchema", reflect.TypeOf((*MockDataStore)(nil).GetSchema), arg0)
+func (mr *MockDataStoreMockRecorder) GetSchema(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSchema", reflect.TypeOf((*MockDataStore)(nil).GetSchema), arg0, arg1)
 }
 
 // SaveItem mocks base method
-func (m *MockDataStore) SaveItem(arg0, arg1 string, arg2 map[string]interface{}) error {
-	ret := m.ctrl.Call(m, "SaveItem", arg0, arg1, arg2)
+func (m *MockDataStore) SaveItem(arg0 context.Context, arg1, arg2 string, arg3 map[string]interface{}) error {
+	ret := m.ctrl.Call(m, "SaveItem", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // SaveItem indicates an expected call of SaveItem
-func (mr *MockDataStoreMockRecorder) SaveItem(arg0, arg1, arg2 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveItem", reflect.TypeOf((*MockDataStore)(nil).SaveItem), arg0, arg1, arg2)
+func (mr *MockDataStoreMockRecorder) SaveItem(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveItem", reflect.TypeOf((*MockDataStore)(nil).SaveItem), arg0, arg1, arg2, arg3)
 }

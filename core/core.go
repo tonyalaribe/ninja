@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"errors"
 	"strings"
 
@@ -17,12 +18,12 @@ type Config struct {
 type configFunc func(*Config)
 
 type Manager interface {
-	CreateCollection(name string, schema, metadata map[string]interface{}) error
-	GetCollections() (collections []datalayer.CollectionVM, err error)
-	GetSchema(collectionName string) (map[string]interface{}, error)
-	SaveItem(collectionName string, item map[string]interface{}) error
-	GetItem(collectionName, itemID string) (item map[string]interface{}, err error)
-	GetItems(collectionName string, queryMeta datalayer.QueryMeta) (items []map[string]interface{}, respInfo datalayer.ItemsResponseInfo, err error)
+	CreateCollection(ctx context.Context, name string, schema, metadata map[string]interface{}) error
+	GetCollections(ctx context.Context) (collections []datalayer.CollectionVM, err error)
+	GetSchema(ctx context.Context, collectionName string) (map[string]interface{}, error)
+	SaveItem(ctx context.Context, collectionName string, item map[string]interface{}) error
+	GetItem(ctx context.Context, collectionName, itemID string) (item map[string]interface{}, err error)
+	GetItems(ctx context.Context, collectionName string, queryMeta datalayer.QueryMeta) (items []map[string]interface{}, respInfo datalayer.ItemsResponseInfo, err error)
 }
 
 func New(configFuncs ...configFunc) (*Config, error) {
@@ -51,25 +52,25 @@ func (v ValidationErrors) ValidationErrors() []gojsonschema.ResultError {
 	return ([]gojsonschema.ResultError)(v)
 }
 
-func (cf *Config) CreateCollection(name string, schema, metadata map[string]interface{}) error {
+func (cf *Config) CreateCollection(ctx context.Context, name string, schema, metadata map[string]interface{}) error {
 	loader := gojsonschema.NewGoLoader(schema)
 	validatedSchema, err := loader.LoadJSON()
 	if err != nil {
 		return err
 	}
-	return cf.datastore.CreateCollection(name, validatedSchema.(map[string]interface{}), metadata)
+	return cf.datastore.CreateCollection(ctx, name, validatedSchema.(map[string]interface{}), metadata)
 }
 
-func (cf *Config) GetCollections() (collections []datalayer.CollectionVM, err error) {
-	return cf.datastore.GetCollections()
+func (cf *Config) GetCollections(ctx context.Context) (collections []datalayer.CollectionVM, err error) {
+	return cf.datastore.GetCollections(ctx)
 }
 
-func (cf *Config) GetSchema(collectionName string) (schema map[string]interface{}, err error) {
-	return cf.datastore.GetSchema(collectionName)
+func (cf *Config) GetSchema(ctx context.Context, collectionName string) (schema map[string]interface{}, err error) {
+	return cf.datastore.GetSchema(ctx, collectionName)
 }
 
-func (cf *Config) SaveItem(collectionName string, item map[string]interface{}) error {
-	schema, err := cf.datastore.GetSchema(collectionName)
+func (cf *Config) SaveItem(ctx context.Context, collectionName string, item map[string]interface{}) error {
+	schema, err := cf.datastore.GetSchema(ctx, collectionName)
 	schemaLoader := gojsonschema.NewGoLoader(schema)
 	dataLoader := gojsonschema.NewGoLoader(item)
 
@@ -90,15 +91,15 @@ func (cf *Config) SaveItem(collectionName string, item map[string]interface{}) e
 
 	// TODO(tonyalaribe): investigate how to handle slugs, and indexing.
 
-	return cf.datastore.SaveItem(collectionName, itemID, item)
+	return cf.datastore.SaveItem(ctx, collectionName, itemID, item)
 }
 
-func (cf *Config) GetItem(collectionName, itemID string) (item map[string]interface{}, err error) {
-	return cf.datastore.GetItem(collectionName, itemID)
+func (cf *Config) GetItem(ctx context.Context, collectionName, itemID string) (item map[string]interface{}, err error) {
+	return cf.datastore.GetItem(ctx, collectionName, itemID)
 }
 
-func (cf *Config) GetItems(collectionName string, queryMeta datalayer.QueryMeta) (items []map[string]interface{}, respInfo datalayer.ItemsResponseInfo, err error) {
-	return cf.datastore.GetItems(collectionName, queryMeta)
+func (cf *Config) GetItems(ctx context.Context, collectionName string, queryMeta datalayer.QueryMeta) (items []map[string]interface{}, respInfo datalayer.ItemsResponseInfo, err error) {
+	return cf.datastore.GetItems(ctx, collectionName, queryMeta)
 }
 
 func UseDataStore(ds datalayer.DataStore) configFunc {

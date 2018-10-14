@@ -1,6 +1,7 @@
 package datalayer
 
 import (
+	"context"
 	"errors"
 	"log"
 	"sync"
@@ -50,12 +51,12 @@ type CollectionVM struct {
 //go:generate mockgen -destination=./mock/mock_datastore.go -package=mock github.com/tonyalaribe/ninja/datalayer DataStore
 type DataStore interface {
 	Connect(dbConfig DBConfig) (datastore DataStore, err error)
-	CreateCollection(name string, schema, metadata map[string]interface{}) error
-	GetCollections() (collections []CollectionVM, err error)
-	GetSchema(collectionName string) (map[string]interface{}, error)
-	SaveItem(collectionName, itemID string, item map[string]interface{}) error
-	GetItem(collectionName, itemID string) (item map[string]interface{}, err error)
-	GetItems(collectionName string, queryMeta QueryMeta) (items []map[string]interface{}, respInfo ItemsResponseInfo, err error)
+	CreateCollection(ctx context.Context, name string, schema, metadata map[string]interface{}) error
+	GetCollections(ctx context.Context) (collections []CollectionVM, err error)
+	GetSchema(ctx context.Context, collectionName string) (map[string]interface{}, error)
+	SaveItem(ctx context.Context, collectionName, itemID string, item map[string]interface{}) error
+	GetItem(ctx context.Context, collectionName, itemID string) (item map[string]interface{}, err error)
+	GetItems(ctx context.Context, collectionName string, queryMeta QueryMeta) (items []map[string]interface{}, respInfo ItemsResponseInfo, err error)
 }
 
 type QueryMeta struct {

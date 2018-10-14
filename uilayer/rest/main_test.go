@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"runtime/debug"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -60,8 +61,9 @@ func AssertEqual(t *testing.T, a interface{}, b interface{}) {
 	if a == b {
 		return
 	}
-	// debug.PrintStack()
-	t.Errorf("Received %v (type %v), expected %v (type %v)", a, reflect.TypeOf(a), b, reflect.TypeOf(b))
+
+	t.Helper()
+	t.Errorf("Received %v (type %v), expected %v (type %v) \n %s", a, reflect.TypeOf(a), b, reflect.TypeOf(b), string(debug.Stack()))
 }
 
 // AssertNotEqual checks if values are not equal
