@@ -2,7 +2,6 @@ package mongodb
 
 import (
 	"github.com/globalsign/mgo"
-	"github.com/globalsign/mgo/bson"
 	"github.com/pkg/errors"
 	"github.com/tonyalaribe/ninja/datalayer"
 )
@@ -34,14 +33,14 @@ func (ds *Datastore) Connect(config datalayer.DBConfig) (datalayer.DataStore, er
 }
 
 type collectionData struct {
-	ID       string                 `bson:"_id"`
+	Name     string                 `bson:"_id"`
 	Schema   map[string]interface{} `bson:"schema"`
 	MetaData map[string]interface{} `bson:"metadata"`
 }
 
 func (ds *Datastore) CreateCollection(name string, schema, metadata map[string]interface{}) error {
 	data := collectionData{}
-	data.ID = name
+	data.Name = name
 	data.Schema = schema
 	data.MetaData = metadata
 	err := ds.DB.C(ds.SchemaCollection).Insert(data)
@@ -76,6 +75,6 @@ func (ds *Datastore) GetItem(collectionName, itemID string) (item map[string]int
 }
 
 func (ds *Datastore) GetItems(collectionName string, queryData datalayer.QueryMeta) (items []map[string]interface{}, respInfo datalayer.ItemsResponseInfo, err error) {
-	err = ds.DB.C(collectionName).Find(bson.M{}).All(&items)
+	err = ds.DB.C(collectionName).Find(nil).All(&items)
 	return items, respInfo, errors.Wrap(err, "mongoDB: unable to items")
 }

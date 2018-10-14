@@ -28,15 +28,16 @@ func (server *Server) Routes() *chi.Mux {
 		Debug:            false,
 	})
 	router.Use(chiCors.Handler)
-	router.Post("/api/collections", ErrorWrapper(server.CreateCollection))
-	router.Get("/api/collections", ErrorWrapper(server.GetCollections))
-	router.Get("/api/collections/{collectionName}", ErrorWrapper(server.GetSchema))
-	router.Post("/api/collections/{collectionName}", ErrorWrapper(server.SaveItem))
-	router.Get("/ping", ErrorWrapper(PingPong))
+	router.Get("/api/collections/{collectionName}/schema", ResponseWrapper(server.GetSchema))
+	router.Get("/api/collections/{collectionName}", ResponseWrapper(server.GetItems))
+	router.Post("/api/collections/{collectionName}", ResponseWrapper(server.SaveItem))
+
+	router.Get("/api/collections", ResponseWrapper(server.GetCollections))
+	router.Post("/api/collections", ResponseWrapper(server.CreateCollection))
+	router.Get("/ping", PingPong)
 	return router
 }
 
-func PingPong(w http.ResponseWriter, r *http.Request) (int, error) {
+func PingPong(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("pong"))
-	return http.StatusOK, nil
 }

@@ -49,16 +49,25 @@ func (server *Server) Run() {
 	<-idleConnsClosed
 }
 
-func ErrorWrapper(f func(w http.ResponseWriter, r *http.Request) (int, error)) http.HandlerFunc {
+type ResponseResource struct {
+	Code  int         `json:"code,omitempty"`
+	Error string      `json:"error,omitempty"`
+	Data  interface{} `json:"data,omitempty"`
+}
+
+func ResponseWrapper(f func(w http.ResponseWriter, r *http.Request) (interface{}, int, error)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		code, err := f(w, r)
-		if err != nil {
-			msg := map[string]interface{}{
-				"error": err.Error(),
-				"code":  code,
-			}
-			render.JSON(w, r, msg)
+		responseData, statusCode, err := f(w, r)
+
+		resp := ResponseResource{
+			Code: statusCode,
+			Data: responseData,
 		}
+		if err != nil {
+			resp.Error = err.Error()
+		}
+		render.Status(r, statusCode)
+		render.JSON(w, r, resp)
 	}
 }
 

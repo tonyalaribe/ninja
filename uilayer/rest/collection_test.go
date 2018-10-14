@@ -50,7 +50,7 @@ func createCollection(t *testing.T, req string) {
 	s := &Server{
 		core: coreManager,
 	}
-	server := httptest.NewServer(ErrorWrapper(s.CreateCollection))
+	server := httptest.NewServer(ResponseWrapper(s.CreateCollection))
 	defer server.Close()
 
 	body := bytes.NewReader([]byte(req))
@@ -83,7 +83,7 @@ func TestGetCollections(t *testing.T) {
 	s := &Server{
 		core: coreManager,
 	}
-	server := httptest.NewServer(ErrorWrapper(s.GetCollections))
+	server := httptest.NewServer(ResponseWrapper(s.GetCollections))
 	defer server.Close()
 
 	resp, err := server.Client().Get(server.URL)
@@ -93,8 +93,12 @@ func TestGetCollections(t *testing.T) {
 	body := io.TeeReader(resp.Body, &buf)
 	RespIsNotError(t, body)
 
-	var collections []datalayer.CollectionVM
-	json.NewDecoder(&buf).Decode(&collections)
+	var responseData ResponseResource
+	err = json.NewDecoder(&buf).Decode(&responseData)
+	AssertEqual(t, err, nil)
+
+	collections, ok := responseData.Data.([]datalayer.CollectionVM)
+	AssertEqual(t, ok, true)
 	if len(collections) < 1 {
 		t.Errorf("empty collections list returned")
 	}
@@ -119,11 +123,11 @@ func TestGetSchema(t *testing.T) {
 		core: coreManager,
 	}
 	r := chi.NewMux()
-	r.Get("/{collectionName}", ErrorWrapper(s.GetSchema))
+	r.Get("/{collectionName}/schema", ResponseWrapper(s.GetSchema))
 	server := httptest.NewServer(r)
 	defer server.Close()
 
-	resp, err := server.Client().Get(server.URL + "/" + reqData.Name)
+	resp, err := server.Client().Get(server.URL + "/" + reqData.Name + "/schema")
 	AssertEqual(t, err, nil)
 
 	RespIsNotError(t, resp.Body)
@@ -144,7 +148,7 @@ func TestSaveItem(t *testing.T) {
 		core: coreManager,
 	}
 	r := chi.NewMux()
-	r.Post("/{collectionName}", ErrorWrapper(s.SaveItem))
+	r.Post("/{collectionName}", ResponseWrapper(s.SaveItem))
 	server := httptest.NewServer(r)
 	defer server.Close()
 

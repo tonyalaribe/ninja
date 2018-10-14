@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
@@ -17,7 +18,7 @@ import (
 var dataStore datalayer.DataStore
 
 func TestPing(t *testing.T) {
-	server := httptest.NewServer(ErrorWrapper(PingPong))
+	server := httptest.NewServer(http.HandlerFunc(PingPong))
 	defer server.Close()
 	resp, err := server.Client().Get(server.URL)
 	AssertEqual(t, err, nil)
@@ -42,15 +43,14 @@ func GetCoreManager(t *testing.T) (coreManager core.Manager, mockDataStore *mock
 }
 
 func RespIsNotError(t *testing.T, resp io.Reader) {
-	respData := map[string]interface{}{}
+	var respData ResponseResource
 	err := json.NewDecoder(resp).Decode(&respData)
 	if err != nil {
 		// most likely an array type, so definitely not the generic error return message
 		return
 	}
 
-	_, ok := respData["error"]
-	if ok {
+	if respData.Error != "" {
 		t.Errorf("got an error response: %v", respData)
 	}
 }
